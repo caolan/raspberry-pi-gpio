@@ -1,4 +1,4 @@
-(run (cd wiringPi/wiringPi && make static))
+(run (cd deps/wiringPi/wiringPi && make static))
 (compile -O2 -d1 -s "raspberry-pi-gpio.scm" "deps/wiringPi/wiringPi/libwiringPi.a" -Iinclude -j "raspberry-pi-gpio")
 (compile -O2 -d1 -c "raspberry-pi-gpio.scm" "deps/wiringPi/wiringPi/libwiringPi.a" -Iinclude -unit "raspberry-pi-gpio" -o "raspberry-pi-gpio-static.o")
 (compile -O2 -d0 -s "raspberry-pi-gpio.import.scm")

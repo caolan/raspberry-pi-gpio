@@ -2,3 +2,5 @@
 /*.o
 /*.so
 /raspberry-pi-gpio.import.scm
+/deps/wiringPi/wiringPi/*.o
+/deps/wiringPi/wiringPi/*.a
