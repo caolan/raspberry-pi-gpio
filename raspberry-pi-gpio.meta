@@ -1,0 +1,4 @@
+((synopsis "Raspberry Pi GPIO library")
+ (author "Caolan McMahon")
+ (category io)
+ (license "BSD"))
