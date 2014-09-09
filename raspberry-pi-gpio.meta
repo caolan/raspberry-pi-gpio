@@ -1,4 +1,5 @@
 ((synopsis "Raspberry Pi GPIO library")
  (author "Caolan McMahon")
  (category io)
+ (needs concurrent-native-callbacks)
  (license "BSD"))
