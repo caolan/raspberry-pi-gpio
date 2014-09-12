@@ -1,7 +1,9 @@
-(use posix srfi-18)
+;(use posix srfi-18)
+(use posix)
 
 ;(foreign-declare "#include <stdio.h>")
 ;(foreign-declare "#include <stdint.h>")
+(foreign-declare "#include <poll.h>")
 (foreign-declare "#include <sys/ioctl.h>")
 
 (define fd (file-open "/sys/class/gpio/gpio7/value" open/rdwr))
@@ -24,7 +26,20 @@
     "uint8_t c;
      (void)read(fd, &c, 1);"))
 
+(define wait-for-interrupt
+  (foreign-lambda* int ((int fd))
+    "int x;
+     int timeout = -1;
+     struct pollfd polls;
+     // Setup poll structure
+     polls.fd     = fd ;
+     polls.events = POLLPRI ;	// Urgent data!
+     // Wait for it ...
+     x = poll (&polls, 1, timeout);
+     C_return(x);"))
+
 (clear-pending fd)
-(thread-wait-for-i/o! fd #:input)
+(wait-for-interrupt fd)
+;(thread-wait-for-i/o! fd #:input)
 (clear-interrupt fd)
 (printf "got interrupt")
