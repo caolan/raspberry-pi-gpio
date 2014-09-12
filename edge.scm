@@ -1,33 +1,13 @@
-(use pathfinder shell posix)
+(use srfi-18 posix)
 
-;(foreign-declare "#include <poll.h>")
+(foreign-declare "#include <poll.h>")
 (foreign-declare "#include <sys/ioctl.h>")
 
-(define pf (make-pathfinder '("/usr/local/bin" "/usr/bin")))
-(define gpio (path-find pf "gpio"))
+(define (set-edge pin type)
+  (process-wait (process-run "gpio" (list "edge" (number->string pin) type))))
 
-(if (not gpio)
-  (abort "Couldn't find gpio program"))
-
-(define (set-edge)
-  (run (gpio "edge" 7 "falling")))
-
-;  (define pin 7)
-;  (let ((fd (file-open "/sys/class/gpio/export" open/wronly)))
-;    (file-write fd (string-append (number->string pin) "\n"))
-;    (file-close fd))
-;  (let ((fd (file-open "/sys/class/gpio/gpio7/direction" open/wronly)))
-;    (file-write fd "in\n")
-;    (file-close fd))
-;  (let ((fd (file-open "/sys/class/gpio/gpio7/edge" open/wronly)))
-;    (file-write fd "falling\n")
-;    (file-close fd))
-;  (let ((uid (current-user-id)) (gid (current-group-id)))
-;    (change-file-owner "/sys/class/gpio/gpio7/value" uid gid)
-;    (change-file-owner "/sys/class/gpio/gpio7/edge" uid gid)))
-
-(define (wait-for-edge)
-  (define fd (file-open "/sys/class/gpio/gpio7/value" open/rdwr))
+(define (wait-for-edge pin)
+  (define fd (file-open (sprintf "/sys/class/gpio/gpio~S/value" pin) open/rdwr))
 
   ;; clear any initial pending interrupt
   (define clear-pending
@@ -46,22 +26,26 @@
       "uint8_t c;
        (void)read(fd, &c, 1);"))
 
-  ;(define wait-for-interrupt
-  ;  (foreign-lambda* int ((int fd))
-  ;    "int x;
-  ;     int timeout = -1;
-  ;     struct pollfd polls;
-  ;     // Setup poll structure
-  ;     polls.fd     = fd ;
-  ;     polls.events = POLLPRI ;	// Urgent data!
-  ;     // Wait for it ...
-  ;     x = poll (&polls, 1, timeout);
-  ;     C_return(x);"))
+  (define wait-for-interrupt
+    (foreign-lambda* int ((int fd))
+      "int x;
+       int timeout = -1;
+       struct pollfd polls;
+       // Setup poll structure
+       polls.fd     = fd ;
+       polls.events = POLLPRI ;	// Urgent data!
+       // Wait for it ...
+       x = poll (&polls, 1, timeout);
+       C_return(x);"))
 
   (clear-pending fd)
   (wait-for-interrupt fd)
   (clear-interrupt fd))
 
-(set-edge)
-(wait-for-edge)
-(printf "got interrupt")
+(set-edge 7 "falling")
+(wait-for-edge 7)
+(print "got interrupt on pin 7")
+
+(set-edge 8 "falling")
+(wait-for-edge 8)
+(print "got interrupt on pin 8")
