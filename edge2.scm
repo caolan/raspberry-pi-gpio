@@ -1,7 +1,9 @@
 (use concurrent-native-callbacks mailbox-threads)
 
 (foreign-declare "#include \"deps/wiringPi/wiringPi/wiringPi.h\"")
-(foreign-declare "#include \"edge2-callbacks.h\"")
+;(foreign-declare "#include \"edge2-callbacks.h\"")
+
+(foreign-declare "static void (*callbacks [64])(void);")
 
 (define INT_EDGE_FALLING (foreign-value "INT_EDGE_FALLING" int))
 
