@@ -120,6 +120,7 @@
 (on-falling 7)
 (on-falling 8)
 
+(thread-yield!)
 (let msgloop ((msg (thread-receive)))
   (printf "interrupt on ~S~n" msg)
   (msgloop (thread-receive)))
