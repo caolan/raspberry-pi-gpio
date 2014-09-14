@@ -1,12 +1,14 @@
 (use concurrent-native-callbacks mailbox-threads)
 
 (foreign-declare "#include \"deps/wiringPi/wiringPi/wiringPi.h\"")
+(foreign-declare "#include \"edge2-callbacks.h\"")
 
 (define INT_EDGE_FALLING (foreign-value "INT_EDGE_FALLING" int))
 
 (define t (current-thread))
 
-(define callbacks (make-vector 64))
+;; static void (*isrFunctions [64])(void) ;
+;; isrFunctions [pin] = function ;
 
 (define-syntax make-callbacks
   (syntax-rules ()
@@ -15,9 +17,6 @@
      (begin (define-concurrent-native-callback
               ((n 'raspberry-pi-gpio))
               (thread-send t (string->number (substring n 1))))
-            (vector-set! callbacks
-                         (- (string->number (substring n 1)) 1)
-                         (foreign-value n (function void)))
             (make-callbacks rest)))))
 
 (make-callbacks
@@ -29,18 +28,84 @@
    "f50" "f51" "f52" "f53" "f54" "f55" "f56" "f57" "f58" "f59"
    "f60" "f61" "f62" "f63" "f64"))
 
+(foreign-code
+  "callbacks [0] = f1;
+   callbacks [1] = f2;
+   callbacks [2] = f3;
+   callbacks [3] = f4;
+   callbacks [4] = f5;
+   callbacks [5] = f6;
+   callbacks [6] = f7;
+   callbacks [7] = f8;
+   callbacks [8] = f9;
+   callbacks [9] = f10;
+   callbacks [10] = f11;
+   callbacks [11] = f12;
+   callbacks [12] = f13;
+   callbacks [13] = f14;
+   callbacks [14] = f15;
+   callbacks [15] = f16;
+   callbacks [16] = f17;
+   callbacks [17] = f18;
+   callbacks [18] = f19;
+   callbacks [19] = f20;
+   callbacks [20] = f21;
+   callbacks [21] = f22;
+   callbacks [22] = f23;
+   callbacks [23] = f24;
+   callbacks [24] = f25;
+   callbacks [25] = f26;
+   callbacks [26] = f27;
+   callbacks [27] = f28;
+   callbacks [28] = f29;
+   callbacks [29] = f30;
+   callbacks [30] = f31;
+   callbacks [31] = f32;
+   callbacks [32] = f33;
+   callbacks [33] = f34;
+   callbacks [34] = f35;
+   callbacks [35] = f36;
+   callbacks [36] = f37;
+   callbacks [37] = f38;
+   callbacks [38] = f39;
+   callbacks [39] = f40;
+   callbacks [40] = f41;
+   callbacks [41] = f42;
+   callbacks [42] = f43;
+   callbacks [43] = f44;
+   callbacks [44] = f45;
+   callbacks [45] = f46;
+   callbacks [46] = f47;
+   callbacks [47] = f48;
+   callbacks [48] = f49;
+   callbacks [49] = f50;
+   callbacks [50] = f51;
+   callbacks [51] = f52;
+   callbacks [52] = f53;
+   callbacks [53] = f54;
+   callbacks [54] = f55;
+   callbacks [55] = f56;
+   callbacks [56] = f57;
+   callbacks [57] = f58;
+   callbacks [58] = f59;
+   callbacks [59] = f60;
+   callbacks [60] = f61;
+   callbacks [61] = f62;
+   callbacks [62] = f63;
+   callbacks [63] = f64;")
+
 ;(print (foreign-value f1 (function void)))
-(print (vector-ref callbacks (- 64 1)))
+;(print (vector-ref callbacks (- 64 1)))
 (print (foreign-value f64 (function void)))
 
 (define setup-gpio
   (foreign-lambda int "wiringPiSetupGpio"))
 
 (define (on-falling pin)
-  ((foreign-lambda* int ((int pin) (int type) ((function void (void)) f))
-     "int r = wiringPiISR(pin, type, f);
+  ((foreign-lambda* int ((int pin) (int type))
+     "int r = wiringPiISR(pin, type, callbacks[pin - 1]);
       C_return(r);")
-   pin INT_EDGE_FALLING (vector-ref callbacks (- pin 1))))
+   pin INT_EDGE_FALLING))
 
 (setup-gpio)
 (on-falling 7)
