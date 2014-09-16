@@ -1,4 +1,5 @@
 (compile -O2 -d1 -s "raspberry-pi-gpio.scm" -lwiringPi -Iinclude -j "raspberry-pi-gpio")
+(compile -O2 -d0 -s "raspberry-pi-gpio.import.scm")
 
 (install-extension
   'raspberry-pi-gpio
