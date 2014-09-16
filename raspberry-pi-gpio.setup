@@ -1,10 +1,6 @@
-(run (cd deps/wiringPi/wiringPi && make static))
-(compile -O2 -d1 -s "raspberry-pi-gpio.scm" "deps/wiringPi/wiringPi/libwiringPi.a" -Iinclude -j "raspberry-pi-gpio")
-(compile -O2 -d1 -c "raspberry-pi-gpio.scm" "deps/wiringPi/wiringPi/libwiringPi.a" -Iinclude -unit "raspberry-pi-gpio" -o "raspberry-pi-gpio-static.o")
-(compile -O2 -d0 -s "raspberry-pi-gpio.import.scm")
+(compile -O2 -d1 -s "raspberry-pi-gpio.scm" -lwiringPi -Iinclude -j "raspberry-pi-gpio")
 
 (install-extension
   'raspberry-pi-gpio
-  '("raspberry-pi-gpio.so" "raspberry-pi-gpio.import.so" "raspberry-pi-gpio-static.o")
-  '((version "1.0.0")
-    (static "raspberry-pi-gpio-static.o")))
+  '("raspberry-pi-gpio.so" "raspberry-pi-gpio.import.so")
+  '((version "1.0.0")))

@@ -1,5 +1,5 @@
 ((synopsis "Raspberry Pi GPIO library")
  (author "Caolan McMahon")
  (category io)
- (needs concurrent-native-callbacks)
+ (needs concurrent-native-callbacks mailbox-threads)
  (license "BSD"))
