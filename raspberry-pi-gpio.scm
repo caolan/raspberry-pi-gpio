@@ -25,7 +25,7 @@
    )
 
 (import scheme chicken foreign)
-(use mailbox-threads concurrent-native-callbacks lolevel)
+(use mailbox-threads concurrent-native-callbacks srfi-18 lolevel)
 
 (foreign-declare "#include <wiringPi.h>")
 
@@ -258,10 +258,10 @@
 ;; an argument to the wiringPiISR function
 (define (edge->int type)
   (case type
-    (('falling) INT_EDGE_FALLING)
-    (('rising) INT_EDGE_RISING)
-    (('both) INT_EDGE_BOTH)
-    (('setup) INT_EDGE_SETUP)
+    ((falling) INT_EDGE_FALLING)
+    ((rising) INT_EDGE_RISING)
+    ((both) INT_EDGE_BOTH)
+    ((setup) INT_EDGE_SETUP)
     (else
       (abort (sprintf "Unknown edge type: ~S" type)))))
 
@@ -275,6 +275,6 @@
 
 ;; blocks until a gpio interrupt occurs on a pin that had set-edge called on it
 (define (receive-gpio-event)
-  (thread-receive 'raspberry-pi-gpio))
+  (thread-receive))
 
 )
