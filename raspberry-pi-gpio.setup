@@ -1,7 +1,8 @@
-(compile -O2 -d1 -s "raspberry-pi-gpio.scm" -lwiringPi -Iinclude -j "raspberry-pi-gpio")
+(compile -O3 -d1 -s "raspberry-pi-gpio.scm" -lwiringPi -Iinclude -j "raspberry-pi-gpio"
+	 -emit-type-file "raspberry-pi-gpio.types")
 (compile -O2 -d0 -s "raspberry-pi-gpio.import.scm")
 
 (install-extension
   'raspberry-pi-gpio
-  '("raspberry-pi-gpio.so" "raspberry-pi-gpio.import.so")
-  '((version "1.0.0")))
+  '("raspberry-pi-gpio.so" "raspberry-pi-gpio.import.so" "raspberry-pi-gpio.types")
+  '((version "1.1.0")))
