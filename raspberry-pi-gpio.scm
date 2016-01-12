@@ -269,24 +269,6 @@ EOF
 (define-foreign-variable _errno int "errno")
 
 ;; blocks until a gpio interrupt occurs on a pin that had set-edge called on it
-
-;; Old version, temporarily left here for reference.
-#;(define receive-gpio-event
-  (let ((b (make-string 1)))
-    (lambda ()
-      (let loop ()
-	(let ((x (##core#inline "C_read" pi-pipe-rd b 1)))
-	  (if (fx< x 0)
-	      (cond
-	       ((or (eq? _errno errno/wouldblock)
-		    (eq? _errno errno/again))
-		(thread-wait-for-i/o! pi-pipe-rd #:input)
-		(loop))
-	       ((eq? _errno errno/intr)
-		(##sys#dispatch-interrupt loop))
-	       (else (error "receive-gpio-event unhandled error code" _errno)))
-	      (char->integer (string-ref b 0))))))))
-
 (: receive-gpio-event (-> fixnum fixnum fixnum fixnum))
 (define receive-gpio-event
   (let ((b (make-string 1)))
