@@ -29,6 +29,7 @@
 (import scheme chicken foreign)
 (use srfi-18 posix)
 
+(foreign-declare "#include <pthread.h>")
 (foreign-declare "#include <wiringPi.h>")
 
 (define INPUT (foreign-value "INPUT" int))
